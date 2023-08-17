@@ -8,7 +8,8 @@ const mst_city = database.define(
         city_code  : {
             type : DataTypes.STRING(50),
             allowNull: false,
-            unique: true
+            unique: true,
+            primaryKey: true
         },
         description  : {
             type : DataTypes.STRING(50),
@@ -40,7 +41,7 @@ const mst_city = database.define(
 mst_city.removeAttribute('id');
 
 mst_city.sync({
-    alter: true
+    alter: false
 })
 
 module.exports = mst_city
