@@ -114,6 +114,7 @@ const isAuthenticationToken = async (req, res, next) => {
 //     });
 //   }
 // };
+}
 
 // module.exports = {
 //   createToken,
