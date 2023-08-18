@@ -5,8 +5,7 @@ const cors = require("cors");
 require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` });
 const Middleware = require("./middleware");
 const Database = require("./database");
-const mst_city = require("./src/models/mst_city")
-// const Routing = require("./src/client/routing");
+const RoutingClient = require("./src/client/routing");
 // const RoutingAdmin = require("./src/admin/routing");
 // const RoutingSuperAdmin = require("./src/SuperAdmin/routing");
 // const RoutingPublic = require("./src/public/routing");
@@ -17,26 +16,24 @@ Middleware({ app, bodyParser, cors, express });
 
 // Routing ======
 // Routing(app);
+RoutingClient(app);
 // RoutingAdmin(app);
 // RoutingSuperAdmin(app);
 // RoutingPublic(app);
 // end Routing =====
 
-
-app.get('/', async (req, res) => {
-  try {
-    const result = await mst_city.findAll()
-    res.json({
-      data:result
-    })
-  } catch (error) {
-    res.json({
-      data:error.message
-    })
-  }
-});
-
-
+// app.get('/', async (req, res) => {
+//   try {
+//     const result = await mst_city.findAll()
+//     res.json({
+//       data:result
+//     })
+//   } catch (error) {
+//     res.json({
+//       data:error.message
+//     })
+//   }
+// });
 
 Database.authenticate()
   .then((res) => {
@@ -49,7 +46,6 @@ Database.authenticate()
   .catch((err) => {
     console.log("err", err);
   });
-
 
 Database.sync({
   alter: true,

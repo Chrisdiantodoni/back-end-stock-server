@@ -1,18 +1,18 @@
 const { DataTypes } = require("sequelize");
-
 const database = require("../../database");
+const mst_part = require("./mst_part");
+// const mst_partModel = require("./mst_part");
 
-const exp_mst_plat = database.define(
-  "exp_mst_plat",
+const mst_type = database.define(
+  "mst_type",
   {
-    plat_no: {
-      type: DataTypes.STRING(10),
+    type_code: {
+      type: DataTypes.STRING(15),
+      primaryKey: true,
       allowNull: false,
-      unique: true,
-      primaryKey,
     },
     description: {
-      type: DataTypes.STRING(20),
+      type: DataTypes.STRING(50),
       allowNull: true,
     },
     c_by: {
@@ -31,21 +31,19 @@ const exp_mst_plat = database.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
-    loc: {
-      type: DataTypes.STRING(10),
-      allowNull: true,
-    },
   },
   {
-    timestamps: false,
     freezeTableName: true,
+    timestamps: false,
   }
 );
 
-exp_mst_plat.removeAttribute("id");
+mst_type.removeAttribute("id");
 
-exp_mst_plat.sync({
-  alter: true,
+mst_type.sync({
+  alter: false,
 });
 
-module.exports = exp_mst_plat;
+// Define associations after the models are fully defined and exported
+
+module.exports = mst_type;

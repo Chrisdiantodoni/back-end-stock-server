@@ -1,39 +1,37 @@
 const { DataTypes } = require("sequelize");
-
 const database = require("../../database");
 
-const exp_mst_plat = database.define(
-  "exp_mst_plat",
+const gl_mst_journal = database.define(
+  "gl_mst_journal",
   {
-    plat_no: {
+    journal_code: {
       type: DataTypes.STRING(10),
       allowNull: false,
-      unique: true,
       primaryKey,
     },
     description: {
-      type: DataTypes.STRING(20),
+      type: DataTypes.STRING(50),
       allowNull: true,
     },
     c_by: {
       type: DataTypes.STRING(30),
-      allowNull: true,
+      allowNull: false,
     },
     c_time: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
     },
     m_by: {
       type: DataTypes.STRING(30),
-      allowNull: true,
+      allowNull: false,
     },
     m_time: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
     },
     loc: {
       type: DataTypes.STRING(10),
-      allowNull: true,
+      allowNull: false,
     },
   },
   {
@@ -42,10 +40,10 @@ const exp_mst_plat = database.define(
   }
 );
 
-exp_mst_plat.removeAttribute("id");
+gl_mst_journal.removeAttribute("id");
 
-exp_mst_plat.sync({
+gl_mst_journal.sync({
   alter: true,
 });
 
-module.exports = exp_mst_plat;
+module.exports = gl_mst_journal;

@@ -1,14 +1,12 @@
 const { DataTypes } = require("sequelize");
-
 const database = require("../../database");
 
-const a_gl_trans = database.define(
-  "a_gl_trans",
+const gl_trn_trans = database.define(
+  "gl_trn_trans",
   {
     doc_no: {
       type: DataTypes.STRING(30),
       allowNull: false,
-      unique: true,
       primaryKey,
     },
     doc_date: {
@@ -28,7 +26,7 @@ const a_gl_trans = database.define(
       allowNull: true,
     },
     total: {
-      type: DataTypes.DOUBLE(18.2),
+      type: DataTypes.DOUBLE(18, 2),
       allowNull: true,
     },
     status: {
@@ -70,17 +68,20 @@ const a_gl_trans = database.define(
     ac_code: {
       type: DataTypes.STRING(20),
       allowNull: true,
+      defaultValue: 0,
     },
     giro_no: {
       type: DataTypes.STRING(30),
       allowNull: true,
+      defaultValue: "-",
     },
     kepada: {
       type: DataTypes.STRING(100),
       allowNull: true,
+      defaultValue: "-",
     },
     seri_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER(10),
       allowNull: true,
     },
     description2: {
@@ -106,10 +107,10 @@ const a_gl_trans = database.define(
   }
 );
 
-a_gl_trans.removeAttribute("id");
+gl_trn_trans.removeAttribute("id");
 
-a_gl_trans.sync({
+gl_trn_trans.sync({
   alter: true,
 });
 
-module.exports = a_gl_trans;
+module.exports = gl_trn_trans;
