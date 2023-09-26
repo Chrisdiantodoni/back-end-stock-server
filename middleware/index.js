@@ -22,16 +22,11 @@ const Middleware = ({ app, bodyParser, cors, express }) => {
 
   // file static upload
 
-//   app.use(pathBanner, express.static("./uploads/banner"));
-//   app.use(pathBannerTask, express.static("./uploads/task"));
-//   app.use(pathProfile, express.static("./uploads/profileUser"));
-//   app.use(pathPromo, express.static("./uploads/promo"));
-//   app.use(pathMerchant, express.static("./uploads/merchant"));
-
-//   cron.schedule("* * * * *", () => {
-//     console.log("running a task every minute");
-//     deleteRoom();
-//   });
+  //   app.use(pathBanner, express.static("./uploads/banner"));
+  //   app.use(pathBannerTask, express.static("./uploads/task"));
+  //   app.use(pathProfile, express.static("./uploads/profileUser"));
+  //   app.use(pathPromo, express.static("./uploads/promo"));
+  //   app.use(pathMerchant, express.static("./uploads/merchant"));
 };
 
 module.exports = Middleware;
