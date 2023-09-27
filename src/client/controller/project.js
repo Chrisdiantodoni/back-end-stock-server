@@ -8,6 +8,8 @@ const stockModel = require("../../models/stock");
 const tukangModel = require("../../models/tukang");
 const supplierModel = require("../../models/supplier");
 const projectStockModel = require("../../models/project_stock");
+const gambarModel = require("../../models/gambar");
+const { fullURL, pathImage } = require("../../../utils/url");
 
 class controllerProject {
   async createProject(req, res) {
@@ -16,82 +18,99 @@ class controllerProject {
         nama_project,
         userId,
         lokasi,
-        stockId,
-        deadline,
         tukangId,
-        jobId,
         harga,
         start,
         end,
         status,
         list_stock = [],
         list_job = [],
+        type,
+        beli,
       } = req.body;
-
-      let createdJob = JSON.parse(JSON.stringify(list_job));
-      let createdStock = JSON.parse(JSON.stringify(list_stock));
-      const stockIdArray = stockId.split(",");
-      const jobIdArray = jobId.split(",");
-
-      for (let i = 0; i < createdStock.length; i++) {
-        const stock = createdStock[i];
-        // const stockId = stockIdArray[i];
-        // const quantity = stock.qtyStock;
-
-        // const existingStock = await stockModel.findByPk(stockId);
-
-        // if (existingStock) {
-        //   if (existingStock.qty <= 0) {
-        //     existingStock.qty += Math.abs(quantity);
-        //   } else {
-        //     existingStock.qty -= quantity;
-        //   }
-        //   await existingStock.save();
-        // } else {
-        //   await stockModel.create({
-        //     nama_barang: stock.nama_barang,
-        //     qty: stock.qtyStock,
-        //     supplierId: stock.supplierId,
-        //     harga: stock.hargaStock,
-        //   });
-        // }
-        await projectStockModel.create({
-          nama_barang: stock.nama_barang,
-          qty: stock.qtyStock,
-          supplierId: stock.supplierId,
-          harga: stock.hargaStock,
+      console.log(req.files);
+      const list_gambar = req.files;
+      if (!req.files || !req.files.length) {
+        return responseJSON({
+          res,
+          status: 400,
+          data: "File must be uploaded!",
         });
       }
+
+      const parsedListStock = JSON.parse(list_stock);
+      const parsedListJob = JSON.parse(list_job);
+      console.log(parsedListStock, parsedListJob);
+
+      const createdStockPromises = parsedListStock.map(async (stock) => {
+        const existingStockRecord = await stockModel.findOne({
+          where: {
+            id: stock.id,
+          },
+        });
+        let existingStockId = null;
+        let createdStockRecordId = null;
+        if (existingStockRecord) {
+          existingStockId = existingStockRecord.dataValues?.id;
+        }
+        const createdStockRecord = await projectStockModel.create({
+          nama_barang: stock.nama_barang,
+          qty: stock.qty,
+          supplierId: stock.supplierId,
+          harga: stock.harga,
+          stockId: existingStockRecord?.id,
+        });
+        createdStockRecordId = createdStockRecord.id;
+        const combinedIds = [existingStockId, createdStockRecordId]
+          .filter(Boolean)
+          .join(",");
+        return combinedIds;
+      });
+
+      const createdGambarPromises = list_gambar.map(async (gambar) => {
+        const createdImageRecord = await gambarModel.create({
+          file_name: gambar.filename,
+        });
+        return createdImageRecord.id;
+      });
 
       const createProject = await projectModel.create({
         nama_project,
         userId,
         lokasi,
-        stockId: createdStock,
-        deadline,
         tukangId,
-        jobId: createdJob,
         start,
         end,
         status,
         harga,
+        type,
       });
 
-      const createdJobs = [];
-
-      for (let i = 0; i < list_job.length; i++) {
-        const job = list_job[i];
-        const jobId = jobIdArray[i];
-
-        const createdJob = await jobModel.create({
+      const createdJobsPromises = parsedListJob.map(async (job) => {
+        const createdJobRecord = await jobModel.create({
           name: job.name,
-          qty: job.qtyJob,
-          harga: job.hargaJob,
+          qty: job.qty,
+          harga: job.harga,
           projectId: createProject.id,
           tukangId: tukangId,
         });
-        createdJobs.push(createdJob);
-      }
+        return createdJobRecord.id;
+      });
+
+      const createdStock = (await Promise.all(createdStockPromises)).join(",");
+      const createdGambar = (await Promise.all(createdGambarPromises)).join(
+        ","
+      );
+      const createdJobs = (await Promise.all(createdJobsPromises)).join(",");
+
+      console.log(createdStock, createdGambar, createdJobs);
+
+      // Update the created project with stock and gambar IDs
+      await createProject.update({
+        stockId: createdStock,
+        jobId: createdJobs,
+        gambarId: createdGambar,
+      });
 
       responseJSON({
         res,
@@ -101,7 +120,7 @@ class controllerProject {
     } catch (error) {
       responseJSON({
         res,
-        status: 400,
+        status: 500,
         data: error.message,
       });
     }
@@ -187,27 +206,6 @@ class controllerProject {
     }
   }
 
-  async addTukang(req, res) {
-    const { nama_tukang, no_ktp } = req.body;
-    try {
-      await tukangModel.create({
-        nama_tukang,
-        no_ktp,
-      });
-      responseJSON({
-        res,
-        status: 200,
-        data: "tukang ditambah",
-      });
-    } catch (error) {
-      responseJSON({
-        res,
-        status: 400,
-        data: error.message,
-      });
-    }
-  }
-
   async getProject(req, res) {
     const {
       page = 1,
@@ -218,7 +216,7 @@ class controllerProject {
       start = "",
       end = "",
     } = req.query;
-
+    console.log(req.query);
     const { limit, offset } = getPagination(page, size);
     try {
       const whereClause = {
@@ -243,18 +241,7 @@ class controllerProject {
       }
       if (start && end) {
         whereClause.createdAt = {
-          [Op.or]: [
-            {
-              [column_name]: {
-                [Op.between]: [start, end],
-              },
-            },
-            {
-              createdAt: {
-                [Op.between]: [start, end],
-              },
-            },
-          ],
+          [Op.between]: [start, end],
         };
       }
 

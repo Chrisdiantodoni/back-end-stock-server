@@ -20,10 +20,6 @@ const project = database.define(
       allowNull: true,
       type: DataTypes.STRING,
     },
-    deadline: {
-      allowNull: false,
-      type: DataTypes.DATE,
-    },
     tukangId: {
       allowNull: true,
       type: DataTypes.STRING,
@@ -48,9 +44,21 @@ const project = database.define(
       allowNull: false,
       type: DataTypes.ENUM("request", "approve", "reject"),
     },
-    gambar: {
+    approvalId: {
       allowNull: false,
+      type: DataTypes.INTEGER,
+    },
+    gambarId: {
+      allowNull: true,
       type: DataTypes.STRING,
+    },
+    type: {
+      allowNull: true,
+      type: DataTypes.ENUM("Harian", "Borongan"),
+    },
+    beli: {
+      allowNull: true,
+      type: DataTypes.BOOLEAN,
     },
   },
   {

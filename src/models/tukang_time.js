@@ -8,31 +8,15 @@ const tukang_time = database.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    sunday: {
+    check_in: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    monday: {
+    check_out: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    tuesday: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    wednesday: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    thursday: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    friday: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    saturday: {
+    tanggal_masuk: {
       type: DataTypes.STRING,
       allowNull: true,
     },

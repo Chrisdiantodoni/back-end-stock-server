@@ -6,16 +6,12 @@ require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` });
 const Middleware = require("./middleware");
 const Database = require("./database");
 const RoutingClient = require("./src/client/routing");
-// const RoutingAdmin = require("./src/admin/routing");
-// const RoutingSuperAdmin = require("./src/SuperAdmin/routing");
-// const RoutingPublic = require("./src/public/routing");
+
 // Midleware ====
 
 Middleware({ app, bodyParser, cors, express });
 //  end Middleware ====
 
-// Routing ======
-// Routing(app);
 RoutingClient(app);
 // RoutingAdmin(app);
 // RoutingSuperAdmin(app);

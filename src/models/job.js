@@ -17,7 +17,7 @@ const job = database.define(
       type: DataTypes.STRING,
     },
     qty: {
-      allowNull: false,
+      allowNull: true,
       type: DataTypes.INTEGER,
     },
     harga: {

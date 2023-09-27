@@ -6,7 +6,7 @@ async function exportCSV(data, res, type, filename) {
   try {
     const directory = type;
     const filePath = path.join(
-      __dirname, // Use the current directory of this module as the base
+      __dirname,
       "..",
       "uploads",
       "csv",
@@ -34,7 +34,6 @@ async function exportCSV(data, res, type, filename) {
     });
   } catch (error) {
     console.error("CSV export error:", error);
-    res.status(500).json({ error: "CSV export failed" });
   }
 }
 

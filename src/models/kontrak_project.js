@@ -1,26 +1,18 @@
 const { DataTypes } = require("sequelize");
 const database = require("../../database");
 
-const tukang = database.define(
-  "tukang",
+const kontrak = database.define(
+  "kontrak",
   {
-    nama_tukang: {
+    projectId: {
       allowNull: true,
       type: DataTypes.STRING,
     },
-    type: {
-      allowNull: true,
-      type: DataTypes.ENUM("Kernet", "Tukang"),
-    },
-    no_ktp: {
+    tukangId: {
       allowNull: true,
       type: DataTypes.STRING,
     },
-    no_hp: {
-      allowNull: true,
-      type: DataTypes.STRING,
-    },
-    alamat: {
+    filename: {
       allowNull: true,
       type: DataTypes.STRING,
     },
@@ -31,8 +23,8 @@ const tukang = database.define(
   }
 );
 
-tukang.sync({
+kontrak.sync({
   alter: false,
 });
 
-module.exports = tukang;
+module.exports = kontrak;

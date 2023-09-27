@@ -1,7 +1,7 @@
 const { responseJSON } = require("../../../utils/general");
 const stockModel = require("../../models/stock");
 const { Op, where } = require("sequelize");
-const { general, paging, url } = require("../../../utils");
+const { general, paging, url, exportCSV } = require("../../../utils");
 const { getPagination, getPagingData } = paging;
 const supplierModel = require("../../models/supplier");
 
@@ -85,6 +85,43 @@ class controllerStock {
       responseJSON({
         res,
         status: 400,
+        data: error.message,
+      });
+    }
+  }
+  async exportStock(req, res) {
+    try {
+      const stock = await stockModel.findAll({
+        include: [
+          {
+            model: supplierModel,
+            as: "supplier",
+          },
+        ],
+      });
+
+      if (!stock || stock.length === 0) {
+        return responseJSON({
+          res,
+          status: 200,
+          data: "No data to export",
+        });
+      }
+
+      const csvData = stock.map((stock) => ({
+        Id: stock.id,
+        nama_barang: stock.nama_barang,
+        qty: stock.qty,
+        nama_supplier: stock.supplier?.nama_supplier,
+        harga: stock.harga,
+      }));
+      const filename = "stock.csv";
+      const type = "stock";
+      await exportCSV(csvData, res, type, filename);
+    } catch (error) {
+      responseJSON({
+        res,
+        status: 500,
         data: error.message,
       });
     }
