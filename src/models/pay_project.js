@@ -1,12 +1,19 @@
 const { DataTypes } = require("sequelize");
 const database = require("../../database");
-const supplierModel = require("./supplier");
-const stockModel = require("./stock");
+const project = require("./project");
 
-const project_stock = database.define(
-  "project_stock",
+const payProject = database.define(
+  "payProject",
   {
-    nama_barang: {
+    tukangId: {
+      allowNull: true,
+      type: DataTypes.STRING,
+    },
+    projectId: {
+      allowNull: true,
+      type: DataTypes.INTEGER,
+    },
+    name: {
       allowNull: true,
       type: DataTypes.STRING,
     },
@@ -14,20 +21,27 @@ const project_stock = database.define(
       allowNull: true,
       type: DataTypes.INTEGER,
     },
-
     harga: {
       allowNull: true,
       type: DataTypes.INTEGER,
     },
-    supplierId: {
+    percentage: {
       allowNull: true,
       type: DataTypes.INTEGER,
     },
-    stockId: {
+    hasil_akhir: {
+      allowNull: true,
+      type: DataTypes.STRING,
+    },
+    nominal: {
       allowNull: true,
       type: DataTypes.INTEGER,
     },
-    type: {
+    status: {
+      allowNull: true,
+      type: DataTypes.ENUM("Sudah", "Belum"),
+    },
+    approvalType: {
       allowNull: true,
       type: DataTypes.STRING,
     },
@@ -38,18 +52,8 @@ const project_stock = database.define(
   }
 );
 
-project_stock.sync({
+payProject.sync({
   alter: false,
 });
 
-supplierModel.hasMany(project_stock, {
-  foreignKey: "supplierId",
-});
-
-project_stock.belongsTo(supplierModel);
-
-stockModel.hasMany(project_stock, {
-  foreignKey: "stockId",
-});
-
-module.exports = project_stock;
+module.exports = payProject;

@@ -1,0 +1,9 @@
+{
+    "development": {
+      "username": "root",
+      "password": "hsn123",
+      "database": "hsn_project",
+      "host": "localhost",
+      "dialect": "mysql"
+    }
+  }

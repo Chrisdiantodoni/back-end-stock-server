@@ -89,6 +89,22 @@ class controllerStock {
       });
     }
   }
+  async getAllStock(req, res) {
+    try {
+      const getStock = await stockModel.findAll();
+      responseJSON({
+        res,
+        status: 200,
+        data: getStock,
+      });
+    } catch (error) {
+      responseJSON({
+        res,
+        status: 400,
+        data: error.message,
+      });
+    }
+  }
   async exportStock(req, res) {
     try {
       const stock = await stockModel.findAll({

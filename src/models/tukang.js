@@ -8,9 +8,9 @@ const tukang = database.define(
       allowNull: true,
       type: DataTypes.STRING,
     },
-    type: {
+    upah: {
       allowNull: true,
-      type: DataTypes.ENUM("Kernet", "Tukang"),
+      type: DataTypes.INTEGER,
     },
     no_ktp: {
       allowNull: true,

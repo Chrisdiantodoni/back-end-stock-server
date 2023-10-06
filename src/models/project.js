@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const database = require("../../database");
+const payModel = require("./pay_project");
 
 const project = database.define(
   "project",
@@ -42,11 +43,11 @@ const project = database.define(
     },
     status: {
       allowNull: false,
-      type: DataTypes.ENUM("request", "approve", "reject"),
+      type: DataTypes.ENUM("request", "approved", "reject"),
     },
-    approvalId: {
+    approvalType: {
       allowNull: false,
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
     },
     gambarId: {
       allowNull: true,
@@ -70,5 +71,11 @@ const project = database.define(
 project.sync({
   alter: false,
 });
+
+project.hasMany(payModel, {
+  foreignKey: "projectId",
+});
+
+payModel.belongsTo(project);
 
 module.exports = project;

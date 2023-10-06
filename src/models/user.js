@@ -28,7 +28,9 @@ const user = database.define(
         "Project Manager",
         "Owner",
         "Finance",
-        "Admin"
+        "Admin",
+        "Pembelian",
+        "Admin Manager"
       ),
     },
   },
