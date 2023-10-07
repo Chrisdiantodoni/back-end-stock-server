@@ -9,6 +9,10 @@ const tukang_time = database.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    projectId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     check_in: {
       type: DataTypes.DATE,
       allowNull: true,

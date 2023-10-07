@@ -17,6 +17,10 @@ const approval_pay = database.define(
       allowNull: false,
       type: DataTypes.INTEGER,
     },
+    status: {
+      allowNull: false,
+      type: DataTypes.ENUM("belum", "sudah"),
+    },
   },
   {
     freezeTableName: true,

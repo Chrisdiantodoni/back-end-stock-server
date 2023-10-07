@@ -11,13 +11,118 @@ const supplierModel = require("../../models/supplier");
 const projectStockModel = require("../../models/project_stock");
 const gambarModel = require("../../models/gambar");
 const { fullURL, pathImage } = require("../../../utils/url");
+const payProjectModel = require("../../models/pay_project");
+const progressImageModel = require("../../models/progress_image");
+const payDetailModel = require("../../models/pay_detail");
+const moment = require("moment/moment");
 
 class progressController {
-  async updateProgressDaily(req, res) {
-    const { id } = req.params;
+  async submissionPayDaily(req, res) {
+    const {
+      tukangId,
+      projectId,
+      list_time = [],
+      status,
+      approvalType,
+    } = req.body;
+    console.log(list_time);
+    const list_image = req.files;
+    try {
+      const parsedListTime = JSON.parse(list_time);
+
+      parsedListTime.map(async (time) => {
+        await tukangTimeModel.create({
+          tanggal_masuk: moment(time.tanggal_masuk),
+          check_in: moment(time.check_in),
+          check_out: moment(time.check_out),
+          projectId: projectId,
+          tukangId: time.tukangId,
+        });
+      });
+
+      const createdGambarPromises = list_image.map(async (gambar) => {
+        const createdImageRecord = await progressImageModel.create({
+          file_name: gambar.filename,
+        });
+        return createdImageRecord.id;
+      });
+
+      const createdGambar = (await Promise.all(createdGambarPromises)).join(
+        ","
+      );
+      const createPayment = await payProjectModel.create({
+        tukangId,
+        projectId,
+        status,
+        approvalType,
+        imageId: createdGambar,
+      });
+      responseJSON({
+        res,
+        status: 201,
+        data: createPayment,
+      });
+    } catch (error) {
+      responseJSON({
+        res,
+        status: 400,
+        data: error.message,
+      });
+    }
   }
-  async updateProgressWeekly(req, res) {
-    const { id } = req.params;
+  async submissionPayWeekly(req, res) {
+    const {
+      tukangId,
+      projectId,
+      list_progress = [],
+      status,
+      approvalType,
+    } = req.body;
+
+    try {
+      const list_image = req.files;
+      const parsedListProgress = JSON.parse(list_progress);
+      const createdGambarPromises = list_image.map(async (gambar) => {
+        const createdImageRecord = await progressImageModel.create({
+          file_name: gambar.filename,
+        });
+        return createdImageRecord.id;
+      });
+      const createdGambar = (await Promise.all(createdGambarPromises)).join(
+        ","
+      );
+      console.log(createdGambar);
+      const createPayment = await payProjectModel.create({
+        tukangId,
+        projectId,
+        status,
+        approvalType,
+        imageId: createdGambar,
+      });
+      parsedListProgress.map(async (progress) => {
+        await payDetailModel.create({
+          name: progress.name,
+          qty: progress.qty,
+          harga: progress.harga,
+          nominal: progress.nominal,
+          percentage: progress.percentage,
+          hasil_akhir: progress.hasil_akhir,
+          payId: createPayment.id,
+        });
+      });
+
+      responseJSON({
+        res,
+        status: 201,
+        data: createPayment,
+      });
+    } catch (error) {
+      responseJSON({
+        res,
+        status: 400,
+        data: error.message,
+      });
+    }
   }
 
   async getProjectProgress(req, res) {
@@ -134,6 +239,9 @@ class progressController {
           {
             model: tukangTimeModel,
             as: "tukang_times",
+            where: {
+              projectId: id,
+            },
           },
         ],
       });
@@ -158,6 +266,8 @@ class progressController {
         gambarIds.includes(String(gambar.id))
       );
 
+      console.log(matchingTukang);
+
       getProject = {
         ...getProject.dataValues,
         list_stock: matchingStock,
@@ -168,8 +278,6 @@ class progressController {
           file_name: `${fullURL(req)}${pathImage}/${item.file_name}`,
         })),
       };
-
-      console.log(matchingJob);
       responseJSON({
         res,
         status: 200,

@@ -18,6 +18,11 @@ class uploadFile {
     storage: storageFile("./uploads/project"),
     limits: { fileSize: maxSize },
   }).array("list_gambar", 10);
+
+  uploadProject = multer({
+    storage: storageFile("./uploads/progress"),
+    limits: { fileSize: maxSize },
+  }).array("list_image", 10);
 }
 
 module.exports = new uploadFile();

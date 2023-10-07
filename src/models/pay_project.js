@@ -1,6 +1,5 @@
 const { DataTypes } = require("sequelize");
 const database = require("../../database");
-const project = require("./project");
 
 const payProject = database.define(
   "payProject",
@@ -13,35 +12,15 @@ const payProject = database.define(
       allowNull: true,
       type: DataTypes.INTEGER,
     },
-    name: {
-      allowNull: true,
-      type: DataTypes.STRING,
-    },
-    qty: {
-      allowNull: true,
-      type: DataTypes.INTEGER,
-    },
-    harga: {
-      allowNull: true,
-      type: DataTypes.INTEGER,
-    },
-    percentage: {
-      allowNull: true,
-      type: DataTypes.INTEGER,
-    },
-    hasil_akhir: {
-      allowNull: true,
-      type: DataTypes.STRING,
-    },
-    nominal: {
-      allowNull: true,
-      type: DataTypes.INTEGER,
-    },
     status: {
       allowNull: true,
       type: DataTypes.ENUM("Sudah", "Belum"),
     },
     approvalType: {
+      allowNull: true,
+      type: DataTypes.STRING,
+    },
+    imageId: {
       allowNull: true,
       type: DataTypes.STRING,
     },

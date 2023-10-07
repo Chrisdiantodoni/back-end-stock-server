@@ -9,7 +9,6 @@ const approvalProjectModel = require("../../models/approval_project");
 class controllerApproval {
   async approveProject(req, res) {
     const { id } = req.params;
-
     try {
       const { status = "approved", typeApproval, comment, userId } = req.body;
       console.log(typeApproval);
@@ -110,7 +109,7 @@ class controllerApproval {
       await approvalProjectModel.create({
         projectId: id,
         comment,
-        userId,
+        userId: "rejected",
         status,
       });
       responseJSON({
