@@ -5,15 +5,16 @@ const { multer } = require("../../../utils");
 
 router.post(
   "/weekly",
-  multer.uploadProject,
+  multer.uploadProgress,
   controllerProject.submissionPayWeekly
 );
 router.post(
   "/daily",
-  multer.uploadProject,
+  multer.uploadProgress,
   controllerProject.submissionPayDaily
 );
 router.get("/", controllerProject.getProjectProgress);
-router.get("/:id", controllerProject.getDetailProjectProgress);
+router.get("/daily/:id", controllerProject.getDetailProjectProgressDaily);
+router.get("/weekly/:id", controllerProject.getDetailProjectProgressWeekly);
 
 module.exports = router;

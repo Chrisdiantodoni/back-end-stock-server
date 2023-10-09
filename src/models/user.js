@@ -30,7 +30,7 @@ const user = database.define(
         "Finance",
         "Admin",
         "Pembelian",
-        "Admin Manager"
+        "Admin Project"
       ),
     },
   },

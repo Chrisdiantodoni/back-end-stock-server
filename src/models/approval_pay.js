@@ -11,7 +11,7 @@ const approval_pay = database.define(
     },
     payId: {
       allowNull: false,
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
     },
     userId: {
       allowNull: false,
@@ -19,7 +19,7 @@ const approval_pay = database.define(
     },
     status: {
       allowNull: false,
-      type: DataTypes.ENUM("belum", "sudah"),
+      type: DataTypes.ENUM("approve", "reject"),
     },
   },
   {

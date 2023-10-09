@@ -61,6 +61,10 @@ const project = database.define(
       allowNull: true,
       type: DataTypes.BOOLEAN,
     },
+    imageId: {
+      allowNull: true,
+      type: DataTypes.STRING,
+    },
   },
   {
     freezeTableName: true,

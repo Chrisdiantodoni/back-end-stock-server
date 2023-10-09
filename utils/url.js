@@ -3,6 +3,7 @@ class url {
   // pathRouterAdmin = (nameRouter) => `/api/v1/admin/${nameRouter}`;
   // pathRouterPublic = (nameRouter) => `/api/v1/public/${nameRouter}`;
   pathImage = "/view/image/project";
+  pathProgress = "/view/image/progress";
 
   fullURL = (req) => {
     const protocol = req.protocol;

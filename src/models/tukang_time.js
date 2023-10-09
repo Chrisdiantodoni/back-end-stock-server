@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const database = require("../../database");
 const tukangModel = require("./tukang");
+const payProject = require("./pay_project");
 
 const tukang_time = database.define(
   "tukang_time",
@@ -25,6 +26,10 @@ const tukang_time = database.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
+    payProjectId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   },
   {
     timestamps: true,
@@ -40,5 +45,11 @@ tukangModel.hasMany(tukang_time, {
 });
 
 tukang_time.belongsTo(tukangModel);
+
+payProject.hasMany(tukang_time, {
+  foreignKey: "payProjectId",
+});
+
+tukang_time.belongsTo(payProject);
 
 module.exports = tukang_time;

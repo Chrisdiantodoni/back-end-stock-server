@@ -29,7 +29,7 @@ const pay_detail = database.define(
       allowNull: true,
       type: DataTypes.INTEGER,
     },
-    payId: {
+    payProjectId: {
       allowNull: true,
       type: DataTypes.INTEGER,
     },
@@ -45,7 +45,7 @@ pay_detail.sync({
 });
 
 payProjectModel.hasMany(pay_detail, {
-  foreignKey: "payId",
+  foreignKey: "payProjectId",
 });
 
 pay_detail.belongsTo(payProjectModel);

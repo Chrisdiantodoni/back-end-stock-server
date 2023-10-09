@@ -26,7 +26,7 @@ const job = database.define(
     },
     percentage: {
       allowNull: true,
-      type: DataTypes.INTEGER,
+      type: DataTypes.FLOAT,
     },
     hasil_akhir: {
       allowNull: true,

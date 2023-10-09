@@ -14,7 +14,7 @@ const payProject = database.define(
     },
     status: {
       allowNull: true,
-      type: DataTypes.ENUM("Sudah", "Belum"),
+      type: DataTypes.ENUM("sudah", "belum"),
     },
     approvalType: {
       allowNull: true,
@@ -23,6 +23,10 @@ const payProject = database.define(
     imageId: {
       allowNull: true,
       type: DataTypes.STRING,
+    },
+    total: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
     },
   },
   {

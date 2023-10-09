@@ -10,7 +10,7 @@ const tukangTimeModel = require("../../models/tukang_time");
 const supplierModel = require("../../models/supplier");
 const projectStockModel = require("../../models/project_stock");
 const gambarModel = require("../../models/gambar");
-const { fullURL, pathImage } = require("../../../utils/url");
+const { fullURL, pathProgress, pathImage } = require("../../../utils/url");
 const payProjectModel = require("../../models/pay_project");
 const progressImageModel = require("../../models/progress_image");
 const payDetailModel = require("../../models/pay_detail");
@@ -24,21 +24,12 @@ class progressController {
       list_time = [],
       status,
       approvalType,
+      total,
     } = req.body;
     console.log(list_time);
     const list_image = req.files;
     try {
       const parsedListTime = JSON.parse(list_time);
-
-      parsedListTime.map(async (time) => {
-        await tukangTimeModel.create({
-          tanggal_masuk: moment(time.tanggal_masuk),
-          check_in: moment(time.check_in),
-          check_out: moment(time.check_out),
-          projectId: projectId,
-          tukangId: time.tukangId,
-        });
-      });
 
       const createdGambarPromises = list_image.map(async (gambar) => {
         const createdImageRecord = await progressImageModel.create({
@@ -50,12 +41,36 @@ class progressController {
       const createdGambar = (await Promise.all(createdGambarPromises)).join(
         ","
       );
+      const getProject = await projectModel.findOne({
+        where: {
+          id: projectId,
+        },
+      });
+
+      const combinedIds = [getProject?.dataValues?.imageId, createdGambar].join(
+        ","
+      );
+      await getProject.update({
+        imageId: combinedIds,
+      });
       const createPayment = await payProjectModel.create({
         tukangId,
         projectId,
         status,
         approvalType,
         imageId: createdGambar,
+        total,
+      });
+
+      parsedListTime.map(async (time) => {
+        await tukangTimeModel.create({
+          tanggal_masuk: moment(time.tanggal_masuk),
+          check_in: moment(time.check_in),
+          check_out: moment(time.check_out),
+          projectId: projectId,
+          tukangId: time.tukangId,
+          payProjectId: createPayment.id,
+        });
       });
       responseJSON({
         res,
@@ -77,11 +92,13 @@ class progressController {
       list_progress = [],
       status,
       approvalType,
+      total,
     } = req.body;
 
     try {
       const list_image = req.files;
       const parsedListProgress = JSON.parse(list_progress);
+
       const createdGambarPromises = list_image.map(async (gambar) => {
         const createdImageRecord = await progressImageModel.create({
           file_name: gambar.filename,
@@ -91,13 +108,39 @@ class progressController {
       const createdGambar = (await Promise.all(createdGambarPromises)).join(
         ","
       );
-      console.log(createdGambar);
+      const getProject = await projectModel.findOne({
+        where: {
+          id: projectId,
+        },
+      });
+
+      const combinedIds = [getProject?.dataValues?.imageId, createdGambar].join(
+        ","
+      );
+      await getProject.update({
+        imageId: combinedIds,
+      });
+
       const createPayment = await payProjectModel.create({
         tukangId,
         projectId,
         status,
         approvalType,
         imageId: createdGambar,
+        total,
+      });
+
+      parsedListProgress.map(async (progress) => {
+        await jobModel.update(
+          {
+            percentage: progress.percentage,
+          },
+          {
+            where: {
+              id: progress.id,
+            },
+          }
+        );
       });
       parsedListProgress.map(async (progress) => {
         await payDetailModel.create({
@@ -107,7 +150,7 @@ class progressController {
           nominal: progress.nominal,
           percentage: progress.percentage,
           hasil_akhir: progress.hasil_akhir,
-          payId: createPayment.id,
+          payProjectId: createPayment.id,
         });
       });
 
@@ -215,7 +258,7 @@ class progressController {
     }
   }
 
-  async getDetailProjectProgress(req, res) {
+  async getDetailProjectProgressDaily(req, res) {
     const { id } = req.params;
     try {
       let getProject = await projectModel.findOne({
@@ -244,6 +287,74 @@ class progressController {
             },
           },
         ],
+      });
+      const getGambar = await gambarModel.findAll({
+        raw: true,
+      });
+      const jobIds = getProject.dataValues?.jobId.split(",");
+      const stockIds = getProject.dataValues?.stockId.split(",");
+      const tukangIds = getProject.dataValues?.tukangId.split(",");
+      const gambarIds = getProject.dataValues?.gambarId.split(",");
+
+      const matchingStock = getStock.filter((stock) =>
+        stockIds.includes(String(stock.id))
+      );
+      const matchingJob = getJob.filter((job) =>
+        jobIds.includes(String(job.id))
+      );
+      const matchingTukang = getTukang.filter((tukang) =>
+        tukangIds.includes(String(tukang.id))
+      );
+      const matchingGambar = getGambar.filter((gambar) =>
+        gambarIds.includes(String(gambar.id))
+      );
+
+      console.log(matchingTukang);
+
+      getProject = {
+        ...getProject.dataValues,
+        list_stock: matchingStock,
+        list_jobs: matchingJob,
+        list_tukangs: matchingTukang,
+        list_gambar: matchingGambar.map((item) => ({
+          ...item,
+          file_name: `${fullURL(req)}${pathImage}/${item.file_name}`,
+        })),
+      };
+      responseJSON({
+        res,
+        status: 200,
+        data: getProject,
+      });
+    } catch (error) {
+      responseJSON({
+        res,
+        status: 400,
+        data: error.message,
+      });
+    }
+  }
+  async getDetailProjectProgressWeekly(req, res) {
+    const { id } = req.params;
+    try {
+      let getProject = await projectModel.findOne({
+        where: {
+          id,
+        },
+      });
+      const getStock = await projectStockModel.findAll({
+        include: [
+          {
+            model: supplierModel,
+            as: "supplier",
+          },
+        ],
+      });
+      const getJob = await jobModel.findAll({
+        raw: true,
+      });
+      const getTukang = await tukangModel.findAll({
+        raw: true,
       });
       const getGambar = await gambarModel.findAll({
         raw: true,

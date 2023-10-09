@@ -13,6 +13,7 @@ const { fullURL, pathImage } = require("../../../utils/url");
 const pay = require("./pay");
 const approvalProjectModel = require("../../models/approval_project");
 const payProject = require("../../models/pay_project");
+const progress_image = require("../../models/progress_image");
 
 class controllerProject {
   async createProject(req, res) {
@@ -180,14 +181,21 @@ class controllerProject {
       const getGambar = await gambarModel.findAll({
         raw: true,
       });
+      const getImageProgress = await progress_image.findAll({
+        raw: true,
+      });
 
       const stockIds = getProject.dataValues?.stockId.split(",");
+      const imageIds = getProject.dataValues?.imageId.split(",");
       const jobIds = getProject.dataValues?.jobId.split(",");
       const tukangIds = getProject.dataValues?.tukangId.split(",");
       const gambarIds = getProject.dataValues?.gambarId.split(",");
 
       const matchingStock = getStock.filter((stock) =>
         stockIds.includes(String(stock.id))
+      );
+      const matchingImage = getImageProgress.filter((image) =>
+        imageIds.includes(String(image.id))
       );
       const matchingJob = getJob.filter((job) =>
         jobIds.includes(String(job.id))
@@ -205,6 +213,10 @@ class controllerProject {
         list_jobs: matchingJob,
         list_tukangs: matchingTukang,
         list_gambar: matchingGambar.map((item) => ({
+          ...item,
+          file_name: `${fullURL(req)}${pathImage}/${item.file_name}`,
+        })),
+        list_progress: matchingImage.map((item) => ({
           ...item,
           file_name: `${fullURL(req)}${pathImage}/${item.file_name}`,
         })),

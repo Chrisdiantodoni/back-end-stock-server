@@ -19,7 +19,7 @@ class uploadFile {
     limits: { fileSize: maxSize },
   }).array("list_gambar", 10);
 
-  uploadProject = multer({
+  uploadProgress = multer({
     storage: storageFile("./uploads/progress"),
     limits: { fileSize: maxSize },
   }).array("list_image", 10);
