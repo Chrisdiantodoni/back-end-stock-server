@@ -9,7 +9,7 @@ const tukangModel = require("../../models/tukang");
 const supplierModel = require("../../models/supplier");
 const projectStockModel = require("../../models/project_stock");
 const gambarModel = require("../../models/gambar");
-const { fullURL, pathImage } = require("../../../utils/url");
+const { fullURL, pathImage, pathProgress } = require("../../../utils/url");
 const pay = require("./pay");
 const approvalProjectModel = require("../../models/approval_project");
 const payProject = require("../../models/pay_project");
@@ -34,7 +34,13 @@ class controllerProject {
         approvalType,
         list_tukang = [],
       } = req.body;
-      console.log(req.files);
+      if (!req.files) {
+        responseJSON({
+          res,
+          data: "File not uploaded",
+          status: 422,
+        });
+      }
       const list_gambar = req.files;
 
       const parsedListStock = JSON.parse(list_stock);
@@ -186,7 +192,7 @@ class controllerProject {
       });
 
       const stockIds = getProject.dataValues?.stockId.split(",");
-      const imageIds = getProject.dataValues?.imageId.split(",");
+      const imageIds = getProject.dataValues?.imageId?.split(",") || "";
       const jobIds = getProject.dataValues?.jobId.split(",");
       const tukangIds = getProject.dataValues?.tukangId.split(",");
       const gambarIds = getProject.dataValues?.gambarId.split(",");
@@ -216,10 +222,11 @@ class controllerProject {
           ...item,
           file_name: `${fullURL(req)}${pathImage}/${item.file_name}`,
         })),
-        list_progress: matchingImage.map((item) => ({
-          ...item,
-          file_name: `${fullURL(req)}${pathImage}/${item.file_name}`,
-        })),
+        list_progress:
+          matchingImage.map((item) => ({
+            ...item,
+            file_name: `${fullURL(req)}${pathProgress}/${item.file_name}`,
+          })) || [],
       };
 
       responseJSON({
@@ -230,7 +237,7 @@ class controllerProject {
     } catch (error) {
       responseJSON({
         res,
-        status: 400,
+        status: 500,
         data: error.message,
       });
     }
@@ -417,7 +424,6 @@ class controllerProject {
     const {
       page = 1,
       size = 10,
-      column_name = "nama_project",
       query = "",
       status = "",
       start = "",
@@ -428,11 +434,6 @@ class controllerProject {
     try {
       const whereClause = {
         [Op.or]: [
-          {
-            [column_name]: {
-              [Op.like]: `%${query}%`,
-            },
-          },
           {
             nama_project: {
               [Op.like]: `%${query}%`,

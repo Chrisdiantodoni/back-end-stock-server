@@ -28,6 +28,13 @@ class progressController {
     } = req.body;
     console.log(list_time);
     const list_image = req.files;
+    if (!req.files) {
+      responseJSON({
+        res,
+        data: "File not uploaded",
+        status: 422,
+      });
+    }
     try {
       const parsedListTime = JSON.parse(list_time);
 
@@ -97,6 +104,13 @@ class progressController {
 
     try {
       const list_image = req.files;
+      if (!req.files) {
+        responseJSON({
+          res,
+          data: "File not uploaded",
+          status: 422,
+        });
+      }
       const parsedListProgress = JSON.parse(list_progress);
 
       const createdGambarPromises = list_image.map(async (gambar) => {
@@ -134,6 +148,8 @@ class progressController {
         await jobModel.update(
           {
             percentage: progress.percentage,
+            qty: progress.qty,
+            harga: progress.harga,
           },
           {
             where: {

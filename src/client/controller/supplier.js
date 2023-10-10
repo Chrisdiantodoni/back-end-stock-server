@@ -81,6 +81,7 @@ class controllerSupplier {
       });
     }
   }
+
   async exportCSV(req, res) {
     try {
       const suppliers = await supplierModel.findAll();
@@ -106,6 +107,29 @@ class controllerSupplier {
       responseJSON({
         res,
         status: 500,
+        data: error.message,
+      });
+    }
+  }
+
+  async deleteSupplier(req, res) {
+    const { id } = req.params;
+    try {
+      const supplierDelete = await supplierModel.destroy({
+        where: {
+          id: id,
+        },
+      });
+
+      responseJSON({
+        res,
+        status: 200,
+        data: supplierDelete,
+      });
+    } catch (error) {
+      responseJSON({
+        res,
+        status: 400,
         data: error.message,
       });
     }
