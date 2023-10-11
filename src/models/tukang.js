@@ -8,10 +8,7 @@ const tukang = database.define(
       allowNull: true,
       type: DataTypes.STRING,
     },
-    upah: {
-      allowNull: true,
-      type: DataTypes.INTEGER,
-    },
+
     no_ktp: {
       allowNull: true,
       type: DataTypes.STRING,

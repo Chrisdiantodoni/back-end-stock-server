@@ -14,6 +14,7 @@ const pay = require("./pay");
 const approvalProjectModel = require("../../models/approval_project");
 const payProject = require("../../models/pay_project");
 const progress_image = require("../../models/progress_image");
+const upah_tukang = require("../../models/upah_tukang");
 
 class controllerProject {
   async createProject(req, res) {
@@ -34,10 +35,33 @@ class controllerProject {
         approvalType,
         list_tukang = [],
       } = req.body;
-      if (!req.files) {
+      if (!req.files || req.files.length === 0) {
         responseJSON({
           res,
           data: "File not uploaded",
+          status: 422,
+        });
+        return;
+      }
+      if (!nama_project) {
+        responseJSON({
+          res,
+          data: "nama diperlukan",
+          status: 422,
+        });
+        return;
+      }
+      if (!lokasi) {
+        responseJSON({
+          res,
+          data: "Lokasi Diperlukan",
+          status: 422,
+        });
+      }
+      if (list_tukang.length === 0) {
+        responseJSON({
+          res,
+          data: "tukang tidak dipilih",
           status: 422,
         });
       }
@@ -46,18 +70,6 @@ class controllerProject {
       const parsedListStock = JSON.parse(list_stock);
       const parsedListJob = JSON.parse(list_job);
       const parsedListTukang = JSON.parse(list_tukang);
-      parsedListTukang.map(async (tukang) => {
-        const existingTukang = await tukangModel.findOne({
-          where: {
-            id: tukang.id,
-          },
-        });
-        if (existingTukang) {
-          await existingTukang.update({
-            upah: tukang.upah,
-          });
-        }
-      });
 
       const createdStockPromises = parsedListStock.map(async (stock) => {
         const existingStockRecord = await stockModel.findOne({
@@ -118,6 +130,14 @@ class controllerProject {
         type,
         approvalType,
         beli,
+      });
+      parsedListTukang.map(async (tukang) => {
+        const createUpah = await upah_tukang.create({
+          upah: tukang.upah,
+          projectId: createProject.id,
+          tukangId: tukang.id,
+        });
+        return createUpah.id;
       });
 
       const createdJobsPromises = parsedListJob.map(async (job) => {
@@ -182,7 +202,13 @@ class controllerProject {
         raw: true,
       });
       const getTukang = await tukangModel.findAll({
-        raw: true,
+        include: {
+          model: upah_tukang,
+          as: "upah_tukangs",
+          where: {
+            projectId: id,
+          },
+        },
       });
       const getGambar = await gambarModel.findAll({
         raw: true,
@@ -269,15 +295,16 @@ class controllerProject {
       const parsedListTUkang = JSON.parse(list_tukang);
 
       parsedListTUkang.map(async (tukang) => {
-        await tukangModel
+        await upah_tukang
           .findOne({
             where: {
-              id: tukang.id,
+              tukangId: tukang.id,
+              projectId,
             },
           })
           .then((res) => {
             res.update({
-              upah: tukang.upah,
+              upah: tukang.upah_tukangs[0]?.upah,
             });
           });
       });
@@ -392,13 +419,21 @@ class controllerProject {
           .join(",");
         return combinedIds;
       });
+      const createdTukangId = parsedListTUkang.map(async (tukang) => {
+        const findTukang = await tukangModel.findByPk(tukang.id);
+        return findTukang?.id;
+      });
+
       const createdStock = (await Promise.all(createdStockPromises)).join(",");
       const createdJobs = (await Promise.all(createdJobsPromises)).join(",");
+      const createdTukangs = (await Promise.all(createdTukangId)).join(",");
+
       await projectModel.update(
         {
           stockId: createdStock,
           jobId: createdJobs,
           gambarId: updatedImageIds.join(","),
+          tukangId: createdTukangs,
         },
         {
           where: {

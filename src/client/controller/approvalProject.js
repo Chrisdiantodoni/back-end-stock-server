@@ -10,8 +10,7 @@ class controllerApproval {
   async approveProject(req, res) {
     const { id } = req.params;
     try {
-      const { status = "approved", typeApproval, comment, userId } = req.body;
-      console.log(typeApproval);
+      const { typeApproval, comment, userId } = req.body;
       const findProject = await projectModel.findOne({
         where: {
           id: id,
@@ -19,7 +18,7 @@ class controllerApproval {
       });
       if (findProject) {
         findProject.update({
-          status,
+          status: typeApproval === "Owner" ? "approved" : "request",
           approvalType: typeApproval,
         });
       }
@@ -27,7 +26,7 @@ class controllerApproval {
         projectId: id,
         comment,
         userId,
-        status,
+        status: typeApproval === "Owner" ? "approved" : "request",
       });
 
       const getProject = await projectModel.findOne({
@@ -93,7 +92,7 @@ class controllerApproval {
   }
   async rejectProject(req, res) {
     const { id } = req.params;
-    const { approvalType, comment, userId } = req.body;
+    const { approvalType, comment } = req.body;
     try {
       await projectModel.update(
         {

@@ -15,6 +15,7 @@ const payProjectModel = require("../../models/pay_project");
 const progressImageModel = require("../../models/progress_image");
 const payDetailModel = require("../../models/pay_detail");
 const moment = require("moment/moment");
+const upah_tukang = require("../../models/upah_tukang");
 
 class progressController {
   async submissionPayDaily(req, res) {
@@ -28,14 +29,16 @@ class progressController {
     } = req.body;
     console.log(list_time);
     const list_image = req.files;
-    if (!req.files) {
-      responseJSON({
-        res,
-        data: "File not uploaded",
-        status: 422,
-      });
-    }
+
     try {
+      if (req.files.length === 0) {
+        responseJSON({
+          res,
+          data: "File not uploaded",
+          status: 422,
+        });
+        return;
+      }
       const parsedListTime = JSON.parse(list_time);
 
       const createdGambarPromises = list_image.map(async (gambar) => {
@@ -298,6 +301,13 @@ class progressController {
           {
             model: tukangTimeModel,
             as: "tukang_times",
+            where: {
+              projectId: id,
+            },
+          },
+          {
+            model: upah_tukang,
+            as: "upah_tukangs",
             where: {
               projectId: id,
             },
