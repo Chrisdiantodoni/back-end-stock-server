@@ -15,6 +15,7 @@ const { getPagination, getPagingData } = paging;
 const { fullURL, pathProgress } = require("../../../utils/url");
 const jobModel = require("../../models/job");
 const approval_pay = require("../../models/approval_pay");
+const job = require("../../models/job");
 
 class controllerPay {
   async getListPay(req, res) {
@@ -82,7 +83,7 @@ class controllerPay {
     try {
       const getHistoryPay = await payModel.findAll({
         where: {
-          id: id,
+          projectId: id,
           status: "sudah",
         },
         include: [
@@ -283,7 +284,15 @@ class controllerPay {
       const tukangIds = getDetail.dataValues?.tukangId.split(",");
       const jobIds = getProject.jobId.split(",");
       const getJob = await jobModel.findAll({
-        raw: true,
+        include: [
+          {
+            model: pay_detail,
+            as: "pay_detail",
+            where: {
+              payProjectId: id,
+            },
+          },
+        ],
       });
       const matchingGambar = getGambar.filter((gambar) =>
         gambarIds.includes(String(gambar.id))

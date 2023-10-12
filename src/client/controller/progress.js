@@ -25,9 +25,9 @@ class progressController {
       list_time = [],
       status,
       approvalType,
+      status_penyelesaian,
       total,
     } = req.body;
-    console.log(list_time);
     const list_image = req.files;
 
     try {
@@ -56,7 +56,9 @@ class progressController {
           id: projectId,
         },
       });
-
+      getProject.update({
+        status_penyelesaian,
+      });
       const combinedIds = [getProject?.dataValues?.imageId, createdGambar].join(
         ","
       );
@@ -102,12 +104,13 @@ class progressController {
       list_progress = [],
       status,
       approvalType,
+      status_penyelesaian,
       total,
     } = req.body;
 
     try {
       const list_image = req.files;
-      if (!req.files) {
+      if (req.files.length === 0) {
         responseJSON({
           res,
           data: "File not uploaded",
@@ -129,6 +132,10 @@ class progressController {
         where: {
           id: projectId,
         },
+      });
+
+      getProject.update({
+        status_penyelesaian,
       });
 
       const combinedIds = [getProject?.dataValues?.imageId, createdGambar].join(
@@ -170,6 +177,7 @@ class progressController {
           percentage: progress.percentage,
           hasil_akhir: progress.hasil_akhir,
           payProjectId: createPayment.id,
+          jobId: progress.id,
         });
       });
 

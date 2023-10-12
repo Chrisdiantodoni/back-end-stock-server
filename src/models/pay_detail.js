@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const database = require("../../database");
 const payProjectModel = require("./pay_project");
+const job = require("./job");
 
 const pay_detail = database.define(
   "pay_detail",
@@ -33,6 +34,10 @@ const pay_detail = database.define(
       allowNull: true,
       type: DataTypes.INTEGER,
     },
+    jobId: {
+      allowNull: true,
+      type: DataTypes.INTEGER,
+    },
   },
   {
     freezeTableName: true,
@@ -49,5 +54,11 @@ payProjectModel.hasMany(pay_detail, {
 });
 
 pay_detail.belongsTo(payProjectModel);
+
+job.hasOne(pay_detail, {
+  foreignKey: "jobId",
+});
+
+pay_detail.belongsTo(job);
 
 module.exports = pay_detail;

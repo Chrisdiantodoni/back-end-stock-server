@@ -45,6 +45,7 @@ Database.authenticate()
 
 Database.sync({
   alter: false,
+  force: false,
 });
 
 const port = process.env.PORT;

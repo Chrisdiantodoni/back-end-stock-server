@@ -10,7 +10,7 @@ class controllerApproval {
   async approveProject(req, res) {
     const { id } = req.params;
     try {
-      const { typeApproval, comment, userId } = req.body;
+      const { typeApproval, comment, userId, roles } = req.body;
       const findProject = await projectModel.findOne({
         where: {
           id: id,
@@ -18,7 +18,7 @@ class controllerApproval {
       });
       if (findProject) {
         findProject.update({
-          status: typeApproval === "Owner" ? "approved" : "request",
+          status: roles === "Owner" ? "approved" : "request",
           approvalType: typeApproval,
         });
       }
@@ -34,46 +34,46 @@ class controllerApproval {
           id: id,
         },
       });
-      const getStock = await projectStockModel.findAll({
-        raw: true,
-      });
-      const stockIds = getProject.dataValues?.stockId.split(",");
 
-      const matchingStock = getStock.filter((stock) =>
-        stockIds.includes(String(stock.id))
-      );
-
-      const updatedStockIds = [];
-
-      for (const stock of matchingStock) {
-        const matchingStockRecord = await stockModel.findOne({
-          where: {
-            id: stock.stockId,
-          },
+      if (findProject.dataValues?.status === "approved") {
+        const getStock = await projectStockModel.findAll({
+          raw: true,
         });
-        console.log(stock);
+        const stockIds = getProject.dataValues?.stockId.split(",");
 
-        if (matchingStockRecord) {
-          const newQuantity = parseInt(stock.qty) - matchingStockRecord.qty;
-          await stockModel.update(
-            {
-              qty: newQuantity,
-            },
-            {
+        const updatedStockIds = [];
+
+        for (const stock of getStock) {
+          if (stockIds.includes(String(stock.id))) {
+            const matchingStockRecord = await stockModel.findOne({
               where: {
                 id: stock.stockId,
               },
+            });
+
+            if (matchingStockRecord) {
+              const newQuantity = parseInt(stock.qty) - matchingStockRecord.qty;
+              await stockModel.update(
+                {
+                  qty: newQuantity,
+                },
+                {
+                  where: {
+                    id: stock.stockId,
+                  },
+                }
+              );
+            } else {
+              const supplierId = stock.supplierId;
+              const newStock = await stockModel.create({
+                nama_barang: stock.nama_barang,
+                qty: stock.qty,
+                supplierId: supplierId,
+                harga: stock.harga,
+              });
+              updatedStockIds.push(newStock.id);
             }
-          );
-        } else {
-          const newStock = await stockModel.create({
-            nama_barang: stock.nama_barang,
-            qty: stock.qty,
-            supplierId:
-              stock.supplier?.supplierId || stock.supplier?.supplierId,
-            harga: stock.harga,
-          });
-          updatedStockIds.push(newStock.id);
+          }
         }
       }
 

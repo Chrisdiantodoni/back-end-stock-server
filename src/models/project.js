@@ -65,6 +65,10 @@ const project = database.define(
       allowNull: true,
       type: DataTypes.STRING,
     },
+    status_penyelesaian: {
+      allowNull: true,
+      type: DataTypes.ENUM("Selesai", "Belum Selesai"),
+    },
   },
   {
     freezeTableName: true,

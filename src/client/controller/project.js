@@ -130,6 +130,7 @@ class controllerProject {
         type,
         approvalType,
         beli,
+        status_penyelesaian: "Belum Selesai",
       });
       parsedListTukang.map(async (tukang) => {
         const createUpah = await upah_tukang.create({
@@ -331,7 +332,7 @@ class controllerProject {
           const updatedStock = await existingStockRecord.update({
             nama_barang: stock.nama_barang,
             qty: stock.qty,
-            supplierId: stock.supplierId || stock.supplier?.supplierId,
+            supplierId: stock.supplierId || stock.supplier?.id,
             harga: stock.harga,
           });
           createdStockRecordId = updatedStock?.id;
@@ -339,7 +340,7 @@ class controllerProject {
           const newStock = await projectStockModel.create({
             nama_barang: stock.nama_barang,
             qty: stock.qty,
-            supplierId: stock.supplierId || stock.supplier?.supplierId,
+            supplierId: stock.supplierId || stock.supplier?.id,
             harga: stock.harga,
           });
           createdStockRecordId = newStock?.id;
@@ -377,6 +378,7 @@ class controllerProject {
           harga,
           type,
           beli,
+          approvalType: "Admin Project",
         },
         {
           where: {
