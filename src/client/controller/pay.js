@@ -16,6 +16,7 @@ const { fullURL, pathProgress } = require("../../../utils/url");
 const jobModel = require("../../models/job");
 const approval_pay = require("../../models/approval_pay");
 const job = require("../../models/job");
+const upah_tukang = require("../../models/upah_tukang");
 
 class controllerPay {
   async getListPay(req, res) {
@@ -156,8 +157,13 @@ class controllerPay {
         .then(async (res) => {
           res.update({
             approvalType,
-            status: approvalType === "Finance" || "Admin" ? "sudah" : "belum",
+            status: "belum",
           });
+          if (approvalType === "Finance") {
+            res.update({
+              status: "sudah",
+            });
+          }
           await approval_pay.create({
             userId,
             comments,
@@ -201,6 +207,13 @@ class controllerPay {
             as: "tukang_times",
             where: {
               payProjectId: id,
+            },
+          },
+          {
+            model: upah_tukang,
+            as: "upah_tukangs",
+            where: {
+              projectId: getDetail?.dataValues?.projectId,
             },
           },
         ],

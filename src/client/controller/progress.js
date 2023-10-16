@@ -138,9 +138,10 @@ class progressController {
         status_penyelesaian,
       });
 
-      const combinedIds = [getProject?.dataValues?.imageId, createdGambar].join(
-        ","
-      );
+      const combinedIds = [
+        getProject?.dataValues?.imageId,
+        ...createdGambar,
+      ].join(",");
       await getProject.update({
         imageId: combinedIds,
       });
@@ -172,7 +173,6 @@ class progressController {
         await payDetailModel.create({
           name: progress.name,
           qty: progress.qty,
-          harga: progress.harga,
           nominal: progress.nominal,
           percentage: progress.percentage,
           hasil_akhir: progress.hasil_akhir,
@@ -312,6 +312,7 @@ class progressController {
             where: {
               projectId: id,
             },
+            required: false,
           },
           {
             model: upah_tukang,
@@ -342,8 +343,6 @@ class progressController {
       const matchingGambar = getGambar.filter((gambar) =>
         gambarIds.includes(String(gambar.id))
       );
-
-      console.log(matchingTukang);
 
       getProject = {
         ...getProject.dataValues,

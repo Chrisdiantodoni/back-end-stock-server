@@ -14,10 +14,7 @@ const pay_detail = database.define(
       allowNull: true,
       type: DataTypes.INTEGER,
     },
-    harga: {
-      allowNull: true,
-      type: DataTypes.INTEGER,
-    },
+
     percentage: {
       allowNull: true,
       type: DataTypes.FLOAT,
