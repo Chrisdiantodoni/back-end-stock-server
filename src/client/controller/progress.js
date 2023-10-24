@@ -234,7 +234,7 @@ class progressController {
         where: whereClause,
         limit,
         offset,
-        order: [["id", "DESC"]],
+        order: [["status_penyelesaian", "DESC"]],
       };
 
       const getProject = await projectModel.findAndCountAll(projectOptions);

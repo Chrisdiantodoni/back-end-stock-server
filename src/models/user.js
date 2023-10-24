@@ -17,9 +17,9 @@ const user = database.define(
       allowNull: true,
       type: DataTypes.STRING,
     },
-    pin: {
+    reset_password: {
       allowNull: true,
-      type: DataTypes.STRING,
+      type: DataTypes.BOOLEAN,
     },
     roles: {
       allowNull: true,

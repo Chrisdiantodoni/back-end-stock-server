@@ -27,7 +27,9 @@ class controllerPay {
       query = "",
       start = "",
       end = "",
+      status = "",
     } = req.query;
+    console.log(query);
     try {
       const whereClause = {
         [Op.or]: [
@@ -49,13 +51,23 @@ class controllerPay {
           [Op.between]: [start, end],
         };
       }
+      const whereStatusClause = {
+        [Op.or]: [
+          {
+            status: {
+              [Op.like]: `%${status}%`,
+            },
+          },
+        ],
+      };
 
       const { limit, offset } = getPagination(page, size);
 
       let getListPay = await payModel.findAndCountAll({
         limit,
         offset,
-        order: [["id", "DESC"]],
+        order: [["status", "DESC"]],
+        where: whereStatusClause,
         include: [
           {
             model: projectModel,
